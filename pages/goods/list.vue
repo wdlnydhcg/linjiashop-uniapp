@@ -61,7 +61,7 @@
 					let ret = await this.$u.get('category/list');
 					navList = ret;
 					navList.splice(0, 0, {
-						name: '推荐',
+						name: '推荐11',
 						id: '0'
 					})
 					this.$u.vuex('vuex_navlist', navList);

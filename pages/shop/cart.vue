@@ -65,7 +65,7 @@
 			</view>
 			<view class="right">
 				<u-button type="warning" v-if="rightText =='完成'" @click="addFav" style="margin-right:2rpx;">移入收藏</u-button>
-				<u-button type="error" @click="submit">{{rightText=='编辑'?'结算':'删除'}}</u-button>
+				<u-button @click="submit">{{rightText=='编辑'?'结算':'删除'}}</u-button>
 			</view>
 		</view>
 
@@ -286,6 +286,7 @@
 			background-color: #ffffff;
 			padding:30rpx 30rpx;
 			justify-content: space-between;
+			bottom: 0;
 
 			.left {
 				display: flex;

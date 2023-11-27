@@ -1,6 +1,6 @@
 {
     "name" : "邻家小铺",
-    "appid" : "__UNI__4ED93C0",
+    "appid" : "__UNI__F634B1D",
     "description" : "轻量、简介的开源小商城系统",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -25,7 +25,8 @@
         "nvueCompiler" : "uni-app",
         "compilerVersion" : 3,
         "modules" : {
-            "Payment" : {}
+            "Payment" : {},
+            "OAuth" : {}
         },
         "distribute" : {
             "android" : {
@@ -61,7 +62,13 @@
                 "payment" : {
                     "weixin" : {
                         "__platform__" : [ "android" ],
-                        "appid" : "wx1b39ed76db874344",
+                        "appid" : "wx5dd87de6a998f6b8",
+                        "UniversalLinks" : ""
+                    }
+                },
+                "oauth" : {
+                    "weixin" : {
+                        "appid" : "wx5dd87de6a998f6b8",
                         "UniversalLinks" : ""
                     }
                 }
@@ -102,7 +109,7 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "wx9eed6e59b9c86b4c",
+        "appid" : "wx5dd87de6a998f6b8",
         "setting" : {
             "urlCheck" : true,
             "es6" : true,
@@ -112,7 +119,8 @@
         "optimization" : {
             "subPackages" : true
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "lazyCodeLoading" : "requiredComponents"
     },
     "mp-alipay" : {
         "usingComponents" : true,
@@ -144,5 +152,7 @@
             }
         },
         "title" : "邻家小铺"
-    }
+    },
+    "locale" : "zh-Hans",
+    "fallbackLocale" : "zh-Hans"
 }

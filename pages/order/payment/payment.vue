@@ -21,7 +21,7 @@
 			</view>
 		</u-radio-group>
 
-		<u-button type="primary" @click="submit">立即支付</u-button>
+		<u-button type="primary" @click="submit">立即支付 {{orderSn}}</u-button>
 
 	</view>
 </template>
@@ -35,7 +35,7 @@
 			return {
 				orderSn: '',
 				totalPrice: '',
-				payType: 'wxpay',
+				payType: 'WX_MINI',
 				payWayList: [{
 						name: 'wxpay',
 						text: '微信支付',
@@ -54,14 +54,14 @@
 			this.orderSn = option.orderSn
 			this.totalPrice = option.totalPrice
 			//使用微信访问本系统的时候获取微信openid，否则不获取
-			const userAgent = window.navigator.userAgent.toLowerCase()
-			if (userAgent.indexOf('micromessenger') <= -1) {
-				this.payWayList.push({
-					name: 'alipay',
-					text: '支付宝',
-					img: '/static/img/alipay.png'
-				})
-			}
+			// const userAgent = window.navigator.userAgent.toLowerCase()
+			// if (userAgent.indexOf('micromessenger') <= -1) {
+			// 	this.payWayList.push({
+			// 		name: 'alipay',
+			// 		text: '支付宝',
+			// 		img: '/static/img/alipay.png'
+			// 	})
+			// }
 			this.init()
 
 
@@ -80,64 +80,135 @@
 					}
 				})
 			},
-			submit() {
-				console.log('payType', this.payType);
-				// #ifdef H5
-				if ('wxpay' === this.payType) {
-					this.$u.post('pay/wx/prepare?orderSn=' + this.orderSn).then(res => {
+			submit(res) {
+				uni.login({
+				   success:({code})=>{
+					   console.log("用户信息 code ",code)
+					   this.$u.post('wechat/getOnlyWxOpenId?code='+code).then( res => {
+						   if(res){
+								const openid = res.openid;
+								this.$u.post('pay/wx/prepare?orderSn=' + this.orderSn + "&payType=" + this.payType).then(res => {
+									console.log("prepare  res  ",res);
+									return 
+									uni.requestPayment({
+										provider: 'wxpay',
+										timeStamp: res.timeStamp, //时间戳
+										nonceStr:res.nonceStr, //随机字符串
+										package: res.packageValue, //统一下单接口返回的 prepay_id 参数值
+										signType:res.signType,
+										paySign: res.paySign, //签名内容
+										success: (e) => { 
+											me.queryPayResult()
+										},
+										fail: (e) => {
+											console.log("fail", e);
+											if(e.errMsg.indexOf('denied')>-1){ 
+												uni.showModal({
+													content: '该小程序暂未开通支付功能',
+													showCancel: false
+												})
+											}else{
+												uni.showModal({
+													content: "APP支付失败,原因为: " + e.errMsg,
+													showCancel: false
+												})
+											}
+											this.$u.route({
+												url: '/pages/order/detail',
+												params: {
+													orderSn: this.orderSn
+												}
+											})
+										}
+									})
+								});
+						   }
+						   console.log(' res   ',res);
+					   })
+				   }
 
-						this.wxPayH5({
-								appId: res.appId,
-								nonceStr: res.nonceStr,
-								package: res.packageValue,
-								paySign: res.paySign,
-								signType: res.signType,
-								timeStamp: res.timeStamp
-							}
+				})
+				// uni.login({
+				// 	"provider": "weixin",
+				// 	"onlyAuthorize": true, // 微信登录仅请求授权认证
+				// 	success: function(event){
+				// 		console.log("eventxxx ",event)
+				// 		const {code} = event
+				// 		//客户端成功获取授权临时票据（code）,向业务服务器发起登录请求。
+				// 		uni.request({
+				// 			url: 'https://127.0.0.1:9998/wx/auth', //仅为示例，并非真实接口地址。
+				// 			data: {
+				// 				code: event.code
+				// 			},
+				// 			success: (res) => {
+								
+				// 				console.log("auth res",res)
+				// 				//获得token完成登录
+				// 				uni.setStorageSync('token',res.token)
+				// 			}
+				// 		});
+				// 	},
+				// 	fail: function (err) {
+				// 		// 登录授权失败  
+				// 		// err.code是错误码
+				// 	}
+				// })
+				// // #ifdef H5
+				// if ('wxpay' === this.payType) {
+				// 	this.$u.post('pay/wx/prepare?orderSn=' + this.orderSn).then(res => {
 
-						)
-					})
-				}
-				// #endif
+				// 		this.wxPayH5({
+				// 				appId: res.appId,
+				// 				nonceStr: res.nonceStr,
+				// 				package: res.packageValue,
+				// 				paySign: res.paySign,
+				// 				signType: res.signType,
+				// 				timeStamp: res.timeStamp
+				// 			}
+
+				// 		)
+				// 	})
+				// }
+				// // #endif
 				
-				// #ifndef H5
-				if ('wxpay' === this.payType) {
+				// // #ifndef H5
+				// if ('wxpay' === this.payType) {
 					
-					this.$u.post('pay/wx/prepare?orderSn=' + this.orderSn).then(res => {
-						uni.requestPayment({
-							provider: 'wxpay',
-							timeStamp: res.timeStamp, //时间戳
-							nonceStr:res.nonceStr, //随机字符串
-							package: res.packageValue, //统一下单接口返回的 prepay_id 参数值
-							signType:res.signType,
-							paySign: res.paySign, //签名内容
-							success: (e) => { 
-								me.queryPayResult()
-							},
-							fail: (e) => {
-								console.log("fail", e);
-								if(e.errMsg.indexOf('denied')>-1){ 
-									uni.showModal({
-										content: '该小程序暂未开通支付功能',
-										showCancel: false
-									})
-								}else{
-									uni.showModal({
-										content: "APP支付失败,原因为: " + e.errMsg,
-										showCancel: false
-									})
-								}
-								this.$u.route({
-									url: '/pages/order/detail',
-									params: {
-										orderSn: this.orderSn
-									}
-								})
-							}
-						})
-					});
-				}
-				// #endif
+				// 	this.$u.post('pay/wx/prepare?orderSn=' + this.orderSn).then(res => {
+				// 		uni.requestPayment({
+				// 			provider: 'wxpay',
+				// 			timeStamp: res.timeStamp, //时间戳
+				// 			nonceStr:res.nonceStr, //随机字符串
+				// 			package: res.packageValue, //统一下单接口返回的 prepay_id 参数值
+				// 			signType:res.signType,
+				// 			paySign: res.paySign, //签名内容
+				// 			success: (e) => { 
+				// 				me.queryPayResult()
+				// 			},
+				// 			fail: (e) => {
+				// 				console.log("fail", e);
+				// 				if(e.errMsg.indexOf('denied')>-1){ 
+				// 					uni.showModal({
+				// 						content: '该小程序暂未开通支付功能',
+				// 						showCancel: false
+				// 					})
+				// 				}else{
+				// 					uni.showModal({
+				// 						content: "APP支付失败,原因为: " + e.errMsg,
+				// 						showCancel: false
+				// 					})
+				// 				}
+				// 				this.$u.route({
+				// 					url: '/pages/order/detail',
+				// 					params: {
+				// 						orderSn: this.orderSn
+				// 					}
+				// 				})
+				// 			}
+				// 		})
+				// 	});
+				// }
+				// // #endif
 			},
 			wxPayH5: function(data) {
 				//获取后台传入的数据

@@ -1,10 +1,10 @@
 <template>
 	<view class="wrap">
-		<view class="u-m-t-5">
+		<!-- <view class="u-m-t-5">
 			<u-cell-group>
 				<u-cell-item icon="map" :title="addr.name+' '+addr.tel" @click="chooseAddr"></u-cell-item>
 			</u-cell-group>
-		</view>
+		</view> -->
 
 		<view class="list">
 			<view class="item" v-for="(item,index) in cartList" :key="index">
@@ -31,17 +31,17 @@
 				</u-row>
 			</view>
 		</view>
-
+		<view class="navigation code">
+			经销码 <u-input v-model="codeValue" type="text" border="true" />
+		</view>
 		<view class="navigation">
-			<view class="left">
-
+			<view class="left" style="margin-left: 20rpx;">
 				<view class="item total-price">
 					合计: ￥{{formatPrice(totalPrice)}}
 				</view>
-
 			</view>
 			<view class="right">
-				<u-button type="error" shape="circle" @click="submit">提交订单</u-button>
+				<u-button :disabled="isExitBusCode"  @click="submit">提交订单</u-button>
 			</view>
 		</view>
 
@@ -52,6 +52,7 @@
 	export default {
 		data() {
 			return {
+				codeValue:"",
 				imgUrl: this.baseApi + '/file/getImgStream?idFile=',
 				ids: '',
 				addr: {
@@ -59,14 +60,27 @@
 					tel: ''
 				},
 				chooseAddrId: '',
-				cartList: []
+				cartList: [],
+				isExitBusCode:true
+			}
+		},
+		watch:{
+			codeValue(newValue){
+				this.isExitBusCode = true;
+				if(newValue.length === 4){					
+					let url = 'user/judgedBusCodeExit/' + newValue
+					this.$u.get(url).then(res => {
+						this.isExitBusCode = false;
+						console.log("res",res)
+					})
+				}
 			}
 		},
 		computed: {
 			totalPrice() {
 				return this.cartList.reduce((total, item) => total + (parseFloat(item.goods.price) * item.count), 0)
-
-			}
+			},
+			
 		},
 		onShow() {
 			let chooseAddrId = uni.getStorageSync('chooseAddrId')
@@ -91,7 +105,7 @@
 				this.$u.get(url).then(res => {
 					let addr = res.addr
 					if (!addr || !addr.name) {
-						this.addr.name = '请选择收获地址'
+						this.addr.name = '请选择收货地址'
 					} else {
 						this.addr = addr
 						this.chooseAddrId = addr.id
@@ -116,19 +130,20 @@
 				})
 			},
 			submit() {
-				if (!this.addr || !this.addr.tel || this.addr.tel == '') {
-					this.$u.toast('请选择收货地址')
-					return
-				}
+				// if (!this.addr || !this.addr.tel || this.addr.tel == '') {
+				// 	this.$u.toast('请选择收货地址')
+				// 	return
+				// }
 				let idCarts = ''
 				for (var i in this.cartList) {
 					idCarts += this.cartList[i].id + ','
 				}
 				const params = {
 					idAddress: this.chooseAddrId,
-					idCarts: idCarts
+					idCarts: idCarts,
+					code: this.codeValue
 				}
-				this.$u.post('user/order/save?idAddress=' + this.chooseAddrId + '&idCarts=' + idCarts).then(res => {
+				this.$u.post('user/order/save?idAddress=' + this.chooseAddrId + '&idCarts=' + idCarts + '&busCode=' + this.codeValue ).then(res => {
 					const order = res
 					uni.setStorageSync('chooseAddrId', undefined)
 					uni.getStorageSync('idCarts', undefined)
@@ -181,6 +196,13 @@
 			background-color: #ffffff;
 			padding: 16rpx 0;
 			justify-content: space-between;
+			float: left;
+			left: 0;
+			&.code {
+				bottom: 110rpx;
+				align-items: center;
+				padding: 16rpx 30rpx;
+			}
 
 			.left {
 				display: flex;

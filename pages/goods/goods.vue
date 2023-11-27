@@ -16,21 +16,21 @@
 		<view class="navigation">
 			<view class="left">
 
-				<view class="item" @click="toHome">
+				<!-- <view class="item" @click="toHome">
 					<u-icon name="home" :size="40"></u-icon>
 					<view class="text u-line-1">主页</view>
 				</view>
 				<view class="item" @click="like">
 					<u-icon name="heart" :size="40" :color="likeColor"></u-icon>
 					<view class="text u-line-1">收藏</view>
-				</view>
+				</view> -->
 				<view class="item car" @click="toCart">
 					<u-badge class="car-num" :count="cartCount" type="error" :offset="[-3, -6]"></u-badge>
 					<u-icon name="shopping-cart" :size="40" ></u-icon>
 					<view class="text u-line-1">购物车</view>
 				</view>
 			</view>
-			<view class="right">
+			<view class="right" style="float: right;">
 				<view class="cart btn u-line-1" @click="showSkuPop('cart')">加入购物车</view>
 				<view class="buy btn u-line-1" @click="showSkuPop('buy')">立即购买</view>
 			</view>
@@ -81,7 +81,7 @@
 					</view>
 				</view>
 				<view class="action">
-					<u-button type="error" shape="circle" @click="buy">确定</u-button>
+					<u-button @click="buy">确定</u-button>
 				</view>
 			</view>
 		</u-popup>
@@ -367,7 +367,8 @@
 		margin-top: 100rpx;
 		border: solid 2rpx #f2f2f2;
 		background-color: #ffffff;
-		padding: 16rpx 0;
+		padding: 20rpx;
+		justify-content: space-between;
 
 		.left {
 			display: flex;
@@ -397,17 +398,19 @@
 			.btn {
 				line-height: 66rpx;
 				padding: 0 30rpx;
-				border-radius: 36rpx;
+				border-radius: 6rpx;
 				color: #ffffff;
 			}
 
 			.cart {
-				background-color: #ed3f14;
+				background-color: #ffffff;
+				border: 1rpx solid #000000;
+				color: #000000;
 				margin-right: 30rpx;
 			}
 
 			.buy {
-				background-color: #ff7900;
+				background-color: #000000;
 			}
 		}
 	}

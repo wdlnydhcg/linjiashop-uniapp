@@ -11,6 +11,7 @@
 			 :scroll-into-view="itemId">
 				<view v-for="(item,index) in tabbar" :key="index" class="u-tab-item" :class="[current == index ? 'u-tab-item-active' : '']"
 				 @tap.stop="swichMenu(index)">
+				 
 					<text class="u-line-1">{{item.name}}</text>
 				</view>
 			</scroll-view>
@@ -18,11 +19,12 @@
 				<view class="page-view">
 					<view class="class-item" :id="'item' + index" v-for="(item , index) in tabbar" :key="index">
 						<view class="item-title">
-							<text>{{item.name}}</text>
+							<view>{{item.name}}</view>
+							<image style="width: 100%;" :src="prefix+'/file/getImgStream?idFile='+item.icon" mode="widthFix"></image>
 						</view>
 						<view class="item-container">
-							<view class="thumb-box" v-for="(item1, index1) in item.children" :key="index1" @click="toCategory(item1)">
-								<image class="item-menu-image" :src="baseApi+'/file/getImgStream?idFile='+item1.icon" mode=""></image>
+							<view class="thumb-box" v-for="(item1, index1) in item.goodsList" :key="index1" @click="toCategory(item1)">
+								<image class="item-menu-image" :src="prefix+'/file/getImgStream?idFile='+item1.gallery" mode=""></image>
 								<view class="item-menu-name">{{item1.name}}</view>
 							</view>
 						</view>
@@ -47,6 +49,7 @@
 				arr: [],
 				scrollRightTop: 0, // 右边栏目scroll-view的滚动条高度
 				timer: null, // 定时器
+				prefix: this.baseApi
 
 			}
 		},
@@ -55,7 +58,7 @@
 		},
 		methods: {
 			init() {
-				this.$u.get('category/list').then(res => {
+				this.$u.get('category/categoryAndGoods').then(res => {
 					this.tabbar = res
 					this.getMenuItemTop()
 				})
@@ -65,7 +68,22 @@
 					url: '/pages/shop/search'
 				})
 			},
-			toCategory(category) {
+			toCategory(goods) {
+				console.log('g', goods) 
+				this.$u.route({
+					url: '/pages/goods/goods',
+					params: {
+						id: goods.id
+					}
+				});
+				// this.$u.route({
+				// 	url: '/pages/menu/list',
+				// 	params: {
+				// 		idCategory: category.id
+				// 	}
+				// });
+			},
+			toGoodsDetail(category) {
 				console.log('c', category) 
 				this.$u.route({
 					url: '/pages/menu/list',
@@ -245,7 +263,7 @@
 	.u-tab-item-active::before {
 		content: "";
 		position: absolute;
-		border-left: 4px solid $u-type-primary;
+		border-left: 4px solid #000000;
 		height: 32rpx;
 		left: 0;
 		top: 39rpx;

@@ -8,7 +8,7 @@
 			</u-form-item> 
 			<!-- <view class="tips">未注册的手机号验证后自动创建邻家小铺账号</view> -->
 		 
-			<button @tap="submit" :style="[inputStyle]" class="getSmsCode">获取短信验证码</button>
+			<button @click="submit" :style="[inputStyle]" class="getSmsCode">获取短信验证码</button>
 			<view class="alternative">
 				<view class="password" @click="passwordLogin">密码登录</view>
 				<view class="issue">遇到问题</view>
@@ -62,6 +62,7 @@
 		},
 		methods: {
 			submit() {
+				this.$u.toast('点击');
 				if (!(this.tel && this.tel.length == 11 && this.tel.startsWith('1'))) {
 					this.$u.toast('请输入正确手机号');
 					return;

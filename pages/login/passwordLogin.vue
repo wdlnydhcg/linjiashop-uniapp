@@ -8,7 +8,7 @@
 			<u-form-item>
 			<u-input   type="password" v-model="password" placeholder="请输入密码" />
 			</u-form-item>
-			<button @tap="submit" :style="[inputStyle]" class="getSmsCode">登录</button>
+			<button @click="submit" :style="[inputStyle]" class="getSmsCode">登录</button>
 			<view class="alternative">
 				<view class="password" @click="goPage('/pages/login/login')">手机号登录</view>
 				<view class="issue">遇到问题</view>

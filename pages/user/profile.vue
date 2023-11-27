@@ -22,13 +22,18 @@
 				<u-cell-item icon="list" title="我的订单" @click="openPage('/pages/order/list')"></u-cell-item>
 			</u-cell-group>
 		</view>
+		<view class="u-m-t-20">
+			<u-cell-group>
+				<u-cell-item icon="account" title="我的优惠码" @click="updateSaltCode" :value="saltCode.value"></u-cell-item>
+			</u-cell-group>
+		</view>
 
 		<view class="u-m-t-20">
 			<u-cell-group>
 				<u-cell-item icon="map" title="收货地址" @click="openPage('/pages/address/list')"></u-cell-item>
 				<u-cell-item icon="star" @click="openPage('/pages/favorite/favorite')" title="喜欢的商品"></u-cell-item>
-				<u-cell-item icon="integral" @click="todo" title="我的积分"></u-cell-item>
-				<u-cell-item icon="coupon" @click="todo" title="我的优惠券"></u-cell-item>
+				<!-- <u-cell-item icon="integral" @click="todo" title="我的积分"></u-cell-item>
+				<u-cell-item icon="coupon" @click="todo" title="我的优惠券"></u-cell-item> -->
 			</u-cell-group>
 		</view>
 
@@ -40,6 +45,11 @@
 				<!-- #endif -->
 			</u-cell-group>
 		</view>
+		<u-modal v-model="saltCode.show" title="修改优惠码" @confirm="submitSaltCode" :show-cancel-button="true">
+			<view style="padding:10px 50px;">
+				<u-input style="padding: 0rpx 30rpx;background-color: #ededed;" v-model="saltCode.value" placeholder="请输入优惠码" />
+			</view>
+		</u-modal>
 
 	</view>
 </template>
@@ -48,30 +58,39 @@
 	export default {
 		data() {
 			return {
-				show: true
+				show: true,
+				saltCode:{
+					show: false,
+					value: ''
+				}
 			}
 		},
 		onLoad() {
 			console.log('load.......')
 		},
 		onShow() {
-			// #ifdef H5
+			console.log('show 1 ')
 			this.initH5()
+			// #ifdef H5
+			console.log('show 2 ')
 			// #endif
 		},
 		methods: {
+			updateSaltCode() {
+				if(vuex_user.nickName == '未登录'){
+					console.log("请先登录")
+				}
+				this.saltCode.show = true;
+			},
+			submitSaltCode(){
+				// if(vuex_user.nickName == '未登录'){
+				// 	console.log("请先登录")
+				// }
+			},
 			initH5() {
 				
 				if (this.vuex_user.nickName !=='未登录' && this.vuex_user.refreshWechatInfo === true) {
-					const url = window.location.href
-					if (url.indexOf('localhost') > -1 || url.indexOf('127.0.0.1') > -1) {
-					} else {
-						const userAgent = window.navigator.userAgent.toLowerCase()
-						//使用微信访问本系统的时候获取微信openid，否则不获取
-						if (userAgent.indexOf('micromessenger') > -1) {
-							this.processOpenid()
-						}
-					}
+					this.processOpenid()
 				}
 				
 			},
